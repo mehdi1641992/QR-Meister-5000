@@ -1,131 +1,89 @@
-﻿
-# 🚀 State-of-the-Art QR Code Generator (SaaS Edition)
+# 🚀 QR Meister 5000
 
-A production-grade QR Code Generator built with Flask. Features a high-performance 16K rendering engine, dynamic URL shortening, analytics dashboard, and a complete Content Management System (CMS) for SEO landing pages.
+A free, privacy-first **QR Code & Barcode generator** that runs **entirely in your browser**.
+No server, no database, no sign-up, no tracking — your data never leaves your device.
 
-## ✨ Key Features
+Hosts perfectly on **GitHub Pages** (free static hosting).
 
-### 🎨 Rendering Engine
-- **Hyper-Resolution Support:** Generate QR codes up to **16K resolution** (15,360px) for billboards and print.
-- **Smart Scaling:** Mathematical dot-size calculation to ensure crisp edges at any size.
-- **Logo Overlay:** Intelligent center-logo embedding with transparency support.
-- **Formats:** Export to PNG, JPG, and high-DPI PDF.
+## ✨ Features
 
-### 💼 Business Tools
-- **Dynamic Short Links:** Create editable short links (e.g., `yourdomain.com/s/summer-sale`) that redirect to changing targets.
-- **Bio Link Pages:** Auto-generated "Link-in-Bio" landing pages for Pro users.
-- **Analytics:** Track scan counts, device types (Mobile vs Desktop), and daily performance.
+### 🎨 QR Code Generation
+- **Content types:** Text/URL, WiFi access codes (WPA/WEP/Open), vCard contact cards
+- **Pixel styles:** Square, Rounded, Circle (dots), Classy, Extra Rounded
+- **Customization:** Foreground color, background color, **transparent background**
+- **Logo overlay:** Embed your brand logo in the center (auto-boosts error correction to level H)
 
-### 🛠️ Admin & CMS
-- **Dashboard:** Full admin panel to manage users, campaigns, and global settings.
-- **Programmatic SEO:** Dynamic landing pages for industries (Restaurants, Real Estate, Retail).
-- **Auto-Sitemap:** Dynamic XML sitemap generation for Google indexing.
-- **File Manager:** Upload custom Favicons and Logos directly from settings.
+### 📊 Barcodes
+- **Formats:** Code 128, EAN-13, UPC-A, Code 39 (with human-readable values)
+
+### 📤 Export
+- **Formats:** PNG, JPG, SVG (vector — infinitely scalable)
+- **Resolutions:** 512px (web) up to **8K** (billboards)
+- **Copy to clipboard** with one click
+
+### 🌗 Interface
+- **Live preview** with instant rendering as you type
+- **Dark / light mode** (remembers your preference)
+- **100% client-side** — works offline once loaded, nothing is ever uploaded
 
 ---
 
-## ⚙️ Installation
+## 🌐 Deploy to GitHub Pages (free)
 
-### 1. Clone & Setup
-```bash
-# Clone the repository
-git clone [https://github.com/yourusername/qr-generator.git](https://github.com/yourusername/qr-generator.git)
-cd qr-generator
+1. Push this folder to a GitHub repository:
+   ```bash
+   git init
+   git add .
+   git commit -m "QR Meister 5000 static web app"
+   git branch -M main
+   git remote add origin https://github.com/<your-username>/<your-repo>.git
+   git push -u origin main
+   ```
+2. In your repo, go to **Settings → Pages**.
+3. Under **Build and deployment**, set **Source** to **Deploy from a branch**.
+4. Select **main** branch and **/(root)** folder, then click **Save**.
+5. Wait ~1 minute. Your app is live at:
+   `https://<your-username>.github.io/<your-repo>/`
 
-# Create a virtual environment
-python -m venv venv
+> The included `.nojekyll` file makes GitHub Pages serve files as-is (no Jekyll processing), and `404.html` handles unknown URLs.
 
-# Activate Virtual Environment
-# Windows:
-venv\Scripts\activate
-# Mac/Linux:
-source venv/bin/activate
+---
 
-```
+## 🖥️ Run locally
 
-### 2. Install Dependencies
+No build step and no dependencies. Either:
 
-Bash
+- **Option A:** double-click `index.html` (works from the file system), or
+- **Option B:** serve it (recommended):
+  ```bash
+  python -m http.server 8000
+  # then open http://localhost:8000
+  ```
 
-```
-pip install -r requirements.txt
-
-```
-
-### 3. Initialize Database
-
-The application automatically creates the SQLite database (`site.db`) on the first run. No manual SQL setup is required.
-
-### 4. Run the Application
-
-Bash
-
-```
-python flask_app.py
-
-```
-
-_The app will launch at `http://127.0.0.1:5000`_
-
-----------
-
-## 🔐 Admin Access (Important)
-
-On the very first run, the system automatically creates a **Super Admin** account.
-
--   **Login URL:** `/login`
-    
--   **Default Username:** `admin`
-    
--   **Default Password:** `admin123`
-    
--   **Master Security PIN:** `123456789`
-    
-
-> ⚠️ **Security Notice:** Please change the admin password and Security PIN immediately from the Admin Profile section after logging in.
-
-----------
+---
 
 ## 📂 Project Structure
 
 ```
 /
-├── flask_app.py          # Core Application Logic (Routes & Engine)
-├── requirements.txt      # Python Dependencies
-├── site.db               # SQLite Database (Auto-created)
-├── static/
-│   ├── uploads/          # User uploaded logos & favicons
-│   └── css/              # (Optional) Custom styles if not using CDN
-└── templates/
-    ├── index.html        # Main Generator Interface
-    ├── login.html        # Admin Login
-    ├── use_case.html     # Dynamic Industry Landing Pages
-    ├── bio_link.html     # User Bio Link Page
-    ├── sitemap_template.xml # XML Template for SEO
-    └── admin/            # Admin Dashboard Templates
-        ├── base.html
-        ├── dashboard.html
-        ├── settings.html
-        ├── campaigns.html
-        └── ...
-
+├── index.html                     # The entire app (single page)
+├── 404.html                       # GitHub Pages fallback page
+├── .nojekyll                      # Disables Jekyll processing on Pages
+├── assets/
+│   ├── css/styles.css             # Custom styles (loader, checkerboard, theme)
+│   ├── js/app.js                  # Generator engine (render, export, tabs)
+│   ├── vendor/                    # Bundled libraries (no CDN dependency)
+│   │   ├── qr-code-styling.min.js #   styled QR rendering (MIT)
+│   │   └── JsBarcode.all.min.js   #   barcode rendering (MIT)
+│   └── img/                       # favicon, logo, social preview images
 ```
 
-## 🚀 Deployment (PythonAnywhere)
+## 🛠️ Tech
 
-1.  Upload all files to your PythonAnywhere file manager.
-    
-2.  Open a **Bash Console** and run: `pip install -r requirements.txt`
-    
-3.  Go to the **Web** tab.
-    
-4.  Set **Source code** path to your folder (e.g., `/home/yourusername/mysite`).
-    
-5.  Reload the web app.
-    
-
-----------
+- [qr-code-styling](https://github.com/ozdemirburak/qr-code-styling) (MIT) — styled QR rendering
+- [JsBarcode](https://github.com/lindell/JsBarcode) (MIT) — barcode rendering
+- [Tailwind CSS](https://tailwindcss.com) via CDN + Phosphor Icons + Google Fonts (Inter)
 
 ## 📜 License
 
-Proprietary Software. All rights reserved. Powered by **QR Master Engine v2.0**
+MIT for the app code. Third-party libraries keep their own licenses.

@@ -1,0 +1,10 @@
+# Old Flask backend remnants (kept out of the static deployment)
+site.db
+venv/
+__pycache__/
+*.pyc
+.env
+
+# OS noise
+.DS_Store
+Thumbs.db

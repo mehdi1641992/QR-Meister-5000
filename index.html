@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>QR Meister 5000 - Free QR Code &amp; Barcode Generator</title>
+    <meta name="description" content="Create free, high-quality QR codes and barcodes instantly. No sign-up, no tracking: WiFi access codes, vCards, custom colors, logo overlays and high-resolution exports - rendered 100% privately in your browser.">
+    <meta name="keywords" content="QR code generator, free qr code, wifi qr code, vcard generator, custom logo qr, barcode generator, qr code maker">
+
+    <meta property="og:title" content="QR Meister 5000 - Free QR Code Generator">
+    <meta property="og:description" content="Generate unlimited QR codes and barcodes for free. Customize with logos, colors, and styles. 100% in-browser and private.">
+    <meta property="og:image" content="assets/img/og-preview.jpg">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+
+    <link rel="icon" href="assets/img/favicon.ico?v=2">
+    <link rel="apple-touch-icon" href="assets/img/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="192x192" href="assets/img/android-chrome-192x192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="assets/img/android-chrome-512x512.png">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = { darkMode: 'class' };
+    </script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+    <style type="text/tailwindcss">
+        .card { @apply rounded-[2rem] shadow-xl border theme-transition bg-white border-gray-200 shadow-gray-200 dark:bg-gray-800 dark:border-gray-700 dark:shadow-gray-900; }
+        .field { @apply w-full p-4 rounded-2xl border bg-gray-50 border-gray-200 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 transition dark:bg-gray-900 dark:border-gray-700 dark:text-white dark:placeholder-gray-600; }
+        .select-field { @apply w-full p-4 rounded-2xl border appearance-none bg-gray-50 border-gray-200 text-gray-900 font-bold cursor-pointer focus:outline-none focus:ring-2 focus:ring-blue-500 transition dark:bg-gray-900 dark:border-gray-700 dark:text-white; }
+        .muted-label { @apply block text-[10px] font-black text-gray-500 uppercase tracking-[0.2em] mb-3; }
+        .tab-btn { @apply flex-1 pb-4 text-xs font-black uppercase tracking-widest border-b-2 border-transparent transition text-gray-400 hover:text-gray-500; }
+        .tab-btn.active { @apply text-gray-900 border-gray-900 dark:text-white dark:border-white; }
+        .ghost-btn { @apply border py-4 rounded-2xl font-bold text-[10px] uppercase tracking-widest transition flex items-center justify-center gap-2 bg-white text-gray-600 border-gray-100 hover:text-gray-900 dark:bg-gray-900 dark:border-gray-700 dark:text-gray-300 dark:hover:text-white; }
+    </style>
+    <link rel="stylesheet" href="assets/css/styles.css">
+</head>
+<body class="min-h-screen flex flex-col items-center py-10 px-4 theme-transition bg-[#f3f4f6] dark:bg-gray-900">
+    <main class="w-full max-w-2xl">
+        <div class="text-center mb-12 relative">
+            <button id="theme_toggle" title="Toggle dark mode"
+                class="absolute right-0 top-0 w-10 h-10 rounded-xl flex items-center justify-center border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700 text-gray-500 dark:text-gray-300 hover:text-blue-500 transition">
+                <i class="ph ph-moon-stars text-lg" id="theme_icon"></i>
+            </button>
+            <h1 class="text-4xl md:text-5xl font-black tracking-tight theme-transition text-gray-900 dark:text-white">
+                QR Meister 5000
+            </h1>
+            <p class="mt-3 text-[10px] font-black uppercase tracking-[0.25em] text-gray-500 dark:text-gray-400">
+                Free QR Code &amp; Barcode Generator
+            </p>
+            <div class="mt-6 inline-flex items-center px-4 py-2 rounded-full shadow-sm border bg-white border-gray-200 dark:bg-gray-800 dark:border-gray-700">
+                <div class="w-2.5 h-2.5 bg-green-500 rounded-full mr-3 animate-pulse"></div>
+                <span class="text-xs font-bold text-gray-600 dark:text-gray-300 uppercase tracking-widest">
+                    100% Private &middot; Renders In Your Browser
+                </span>
+            </div>
+        </div>
+
+        <div class="flex flex-col md:flex-row gap-8 items-start">
+            <div class="flex-1 w-full p-8 card">
+
+                <div class="flex border-b mb-8 border-gray-100 dark:border-gray-700">
+                    <button onclick="switchTab('text_url')" id="tab_text" class="tab-btn active">Text/URL</button>
+                    <button onclick="switchTab('wifi')" id="tab_wifi" class="tab-btn">WiFi</button>
+                    <button onclick="switchTab('vcard')" id="tab_vcard" class="tab-btn">vCard</button>
+                    <button onclick="switchTab('barcode')" id="tab_barcode" class="tab-btn">Barcode</button>
+                    <input type="hidden" id="gen_type" value="qr">
+                    <input type="hidden" id="qr_type" value="text_url">
+                </div>
+
+                <div id="input_wrapper">
+                    <div id="input_text_url" class="fade-in">
+                        <label class="muted-label">Target Content</label>
+                        <textarea id="qr_data" rows="3" class="field resize-none" placeholder="Type something..."></textarea>
+                    </div>
+
+                    <div id="input_wifi" class="hidden fade-in space-y-5">
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="col-span-2">
+                                <label class="muted-label">SSID</label>
+                                <input type="text" id="wifi_ssid" class="field">
+                            </div>
+                            <div>
+                                <label class="muted-label">Encryption</label>
+                                <select id="wifi_type" class="select-field">
+                                    <option value="WPA">WPA/WPA2</option>
+                                    <option value="WEP">WEP</option>
+                                    <option value="nopass">None</option>
+                                </select>
+                            </div>
+                            <div>
+                                <label class="muted-label">Password</label>
+                                <input type="text" id="wifi_pass" class="field">
+                            </div>
+                        </div>
+                    </div>
+                    <div id="input_vcard" class="hidden fade-in space-y-4">
+                        <div class="grid grid-cols-2 gap-4">
+                            <input type="text" id="vc_first" class="field" placeholder="First Name">
+                            <input type="text" id="vc_last" class="field" placeholder="Last Name">
+                        </div>
+                        <input type="text" id="vc_phone" class="field" placeholder="Phone">
+                        <input type="email" id="vc_email" class="field" placeholder="Email">
+                        <input type="text" id="vc_org" class="field" placeholder="Company">
+                    </div>
+
+                    <div id="input_barcode" class="hidden fade-in space-y-4">
+                        <label class="muted-label">Barcode Format</label>
+                        <div class="relative">
+                            <select id="barcode_type" class="select-field">
+                                <option value="code128">Code 128 (Universal)</option>
+                                <option value="ean13">EAN-13 (Retail)</option>
+                                <option value="upca">UPC-A (US Retail)</option>
+                                <option value="code39">Code 39 (Logistics)</option>
+                            </select>
+                            <div class="absolute inset-y-0 right-4 flex items-center pointer-events-none text-gray-400">
+                                <i class="ph ph-caret-down"></i>
+                            </div>
+                        </div>
+                        <label class="muted-label">Data / Numbers</label>
+                        <input type="text" id="barcode_data" class="field" placeholder="e.g. 123456789">
+                    </div>
+                </div>
+
+                <div class="mt-10 pt-8 border-t border-gray-100 dark:border-gray-700">
+
+                    <div id="qr_controls">
+                        <div class="mb-8">
+                            <label class="muted-label">Brand Logo (Overlay)</label>
+                            <div class="relative group">
+                                <input type="file" id="qr_logo" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10">
+                                <div class="p-4 rounded-2xl border border-dashed text-center transition bg-gray-50 border-gray-200 group-hover:border-blue-400 dark:bg-gray-900 dark:border-gray-700 dark:group-hover:border-blue-500">
+                                    <span id="logo_filename" class="text-xs font-bold text-gray-400"><i class="ph ph-image-square mr-2"></i> Click to upload Logo</span>
+                                </div>
+                            </div>
+                            <button id="remove_logo_btn" onclick="removeLogo()" class="hidden mt-2 text-[10px] font-black text-red-500 uppercase tracking-widest flex items-center gap-1 hover:text-red-600 transition">
+                                <i class="ph ph-x-circle"></i> Remove Logo
+                            </button>
+                        </div>
+
+                        <div class="grid grid-cols-2 md:grid-cols-3 gap-6 mb-6">
+                            <div>
+                                <label class="muted-label">Pixel Style</label>
+                                <select id="qr_style" class="select-field h-14">
+                                    <option value="square">&#9632; Square</option>
+                                    <option value="rounded">&#9633; Rounded</option>
+                                    <option value="circle">&#9679; Circle</option>
+                                    <option value="classy">&#9865; Classy</option>
+                                    <option value="extra">&#9635; Extra Rounded</option>
+                                </select>
+                            </div>
+
+                            <div>
+                                <label class="muted-label">Dots Color</label>
+                                <input type="color" id="fg_color" value="#000000" class="w-full h-14 rounded-2xl cursor-pointer border border-gray-200 dark:border-gray-700">
+                            </div>
+
+                            <div class="relative">
+                                <label class="muted-label">Background</label>
+                                <div id="bg_color_wrapper">
+                                    <input type="color" id="bg_color" value="#FFFFFF" class="w-full h-14 rounded-2xl cursor-pointer border border-gray-200 dark:border-gray-700">
+                                </div>
+                                <div id="bg_disabled_overlay" class="hidden absolute inset-0 bg-black/10 backdrop-blur-[1px] rounded-2xl flex items-center justify-center pointer-events-none">
+                                    <span class="text-[9px] font-black text-white uppercase tracking-widest">Crystal Clear</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="flex items-center gap-3">
+                            <input type="checkbox" id="bg_transparent" onclick="toggleTransparent()" class="w-5 h-5 accent-blue-600 cursor-pointer">
+                            <label for="bg_transparent" class="text-xs font-bold uppercase tracking-wider text-gray-600 dark:text-gray-400">Enable Transparency</label>
+                        </div>
+                    </div>
+
+                    <div id="barcode_controls" class="hidden">
+                        <div class="p-4 bg-blue-50 text-blue-700 text-xs font-bold rounded-xl mb-4 dark:bg-blue-950 dark:text-blue-300">
+                            <i class="ph ph-info"></i> Barcodes support colors, but not logos or pixel shapes.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="w-full md:w-80 flex flex-col gap-6 sticky top-10">
+                <div class="p-6 card flex flex-col items-center justify-center min-h-[360px] relative">
+                    <div id="loader" class="loader absolute z-20"></div>
+                    <div id="placeholder_text" class="text-center text-gray-400 px-8 z-10 transition-opacity">
+                        <i class="ph ph-qr-code text-5xl mb-4 opacity-20"></i>
+                        <p class="text-xs font-bold uppercase tracking-widest leading-loose">Live Render Engine</p>
+                    </div>
+                    <div id="qr_render" class="hidden w-full h-full flex items-center justify-center rounded-3xl overflow-hidden checkerboard p-6 relative z-0"></div>
+                    <div id="barcode_render" class="hidden w-full h-full flex items-center justify-center rounded-3xl overflow-hidden bg-white p-6 relative z-0"></div>
+                </div>
+
+                <div class="space-y-3">
+                    <div class="flex gap-2">
+                        <select id="download_format" class="ghost-btn w-1/3 cursor-pointer">
+                            <option value="png">PNG</option>
+                            <option value="jpg">JPG</option>
+                            <option value="svg">SVG</option>
+                        </select>
+                        <select id="download_quality" class="ghost-btn w-2/3 cursor-pointer">
+                            <option value="512">512px (Web)</option>
+                            <option value="1024" selected>1024px (HD)</option>
+                            <option value="2048">2K (Print)</option>
+                            <option value="4096">4K (Large Print)</option>
+                            <option value="8192">8K (Billboard)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="downloadQRCode()" class="w-full bg-black text-white py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-blue-600 transition flex items-center justify-center gap-3 shadow-lg">
+                        <i class="ph ph-download-simple text-lg"></i> Export File
+                    </button>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="copyToClipboard()" class="ghost-btn">
+                            <i class="ph ph-copy"></i> Copy
+                        </button>
+                        <button onclick="resetGenerator()" class="ghost-btn">
+                            <i class="ph ph-arrow-counter-clockwise"></i> Reset
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer class="w-full max-w-2xl mt-20 pb-16 border-t pt-10 border-gray-200 dark:border-gray-700">
+            <p class="text-center text-[10px] font-medium tracking-wide text-gray-400 dark:text-gray-500 leading-relaxed">
+                &copy; 2026 QR Meister 5000 &middot; Runs entirely in your browser &middot; No data ever leaves your device
+            </p>
+        </footer>
+    </main>
+
+    <div id="cookie_banner" class="fixed bottom-6 right-6 max-w-sm w-full p-6 rounded-3xl shadow-2xl border transform translate-y-full opacity-0 transition-all duration-500 z-50 hidden bg-white border-gray-100 dark:bg-gray-800 dark:border-gray-700">
+        <div class="flex items-start gap-4">
+            <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                <i class="ph ph-cookie text-xl"></i>
+            </div>
+            <div>
+                <h4 class="font-bold text-sm mb-1 text-gray-900 dark:text-white">We use cookies</h4>
+                <p class="text-xs leading-relaxed text-gray-500 dark:text-gray-400">
+                    We use strictly necessary cookies to remember your dark mode preference.
+                </p>
+            </div>
+        </div>
+        <div class="mt-4 flex gap-3">
+            <button onclick="acceptCookies()" class="flex-1 bg-black text-white py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-gray-800 transition">Accept</button>
+            <button onclick="closeBanner()" class="px-4 py-3 rounded-xl font-bold text-xs uppercase tracking-widest text-gray-400 hover:text-gray-600 transition">Close</button>
+        </div>
+    </div>
+
+    <script src="assets/vendor/qr-code-styling.min.js"></script>
+    <script src="assets/vendor/JsBarcode.all.min.js"></script>
+    <script src="assets/js/app.js"></script>
+</body>
+</html>
+
+
+
