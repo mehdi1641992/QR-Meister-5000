@@ -1,0 +1,24 @@
+{
+  "name": "qr-meister-5000",
+  "version": "1.0.0",
+  "description": "A free, privacy-first **QR Code & Barcode generator** that runs **entirely in your browser**.\r No server, no database, no sign-up, no tracking — your data never leaves your device.",
+  "main": "uno.config.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mehdi1641992/QR-Meister-5000.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/mehdi1641992/QR-Meister-5000/issues"
+  },
+  "homepage": "https://github.com/mehdi1641992/QR-Meister-5000#readme",
+  "devDependencies": {
+    "unocss": "^66.10.5"
+  }
+}

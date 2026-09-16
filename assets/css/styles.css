@@ -36,6 +36,21 @@ body {
     background-position: 0 0, 0 10px, 10px -10px, -10px 0px;
 }
 
+/* Active tab state (compound selector: plain CSS, not a shortcut) */
+.tab-btn.active {
+    color: #111827;
+    border-color: #111827;
+}
+.dark .tab-btn.active {
+    color: #ffffff;
+    border-color: #ffffff;
+}
+
+/* Smooth theme switch for cards (was part of the old card @apply) */
+.card {
+    transition: all 0.3s ease;
+}
+
 /* Keep rendered canvases inside their preview containers */
 #qr_render canvas {
     max-width: 100%;
