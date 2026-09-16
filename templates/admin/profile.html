@@ -1,0 +1,166 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="max-w-4xl mx-auto pb-20">
+
+    <div class="mb-10">
+        <h2 class="text-3xl font-black text-gray-900 tracking-tight flex items-center gap-3">
+            <i class="ph ph-user-focus text-blue-600"></i> Identity Vault
+        </h2>
+        <p class="text-sm text-gray-500 font-medium mt-1">Manage your credentials, secure PIN, and account identity.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <div class="lg:col-span-1 space-y-6">
+            <div class="bg-white p-6 rounded-[2rem] border border-gray-100 shadow-xl shadow-gray-200/50 text-center relative overflow-hidden">
+                <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-blue-500 to-purple-600"></div>
+
+                <div class="w-20 h-20 bg-gray-900 text-white rounded-3xl flex items-center justify-center text-3xl font-black mx-auto mb-4 shadow-lg">
+                    {{ current_user.username[0]|upper }}
+                </div>
+
+                <h3 class="font-black text-gray-900 text-xl">{{ current_user.username }}</h3>
+                <p class="text-[10px] font-black uppercase tracking-widest text-blue-500 mt-1">{{ current_user.uid or 'Staff Member' }}</p>
+
+                <div class="mt-6 pt-6 border-t border-gray-50 space-y-3">
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-400 font-bold uppercase">Status</span>
+                        <span class="bg-green-100 text-green-700 px-2 py-1 rounded-md font-black text-[9px] uppercase">Active</span>
+                    </div>
+                    <div class="flex justify-between items-center text-xs">
+                        <span class="text-gray-400 font-bold uppercase">Plan</span>
+                        <span class="bg-yellow-100 text-yellow-700 px-2 py-1 rounded-md font-black text-[9px] uppercase">
+                            {{ 'Lifetime Pro' if current_user.is_pro else 'Basic' }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bg-orange-50 border border-orange-100 p-5 rounded-2xl">
+                <div class="flex items-center gap-3 mb-2">
+                    <i class="ph ph-shield-check text-orange-600 text-xl"></i>
+                    <h4 class="font-bold text-orange-900 text-sm">Security Pulse</h4>
+                </div>
+                <p class="text-[11px] text-orange-700 leading-relaxed">
+                    {% if current_user.pending_update_type %}
+                        Your request to update <strong>{{ current_user.pending_update_type }}</strong> is currently awaiting Superadmin approval.
+                    {% else %}
+                        Your account is fully synchronized. No pending security changes.
+                    {% endif %}
+                </p>
+            </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-8">
+
+            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+                <h3 class="font-black text-gray-900 mb-6 flex items-center gap-2">
+                    <i class="ph ph-key text-blue-500"></i> Change Login Password
+                </h3>
+                <form method="POST" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Current Password</label>
+                            <input type="password" name="current_password" required class="w-full p-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-gray-200 transition outline-none text-sm">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">New Password</label>
+                            <input type="password" name="new_password" required class="w-full p-3.5 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-gray-200 transition outline-none text-sm">
+                        </div>
+                    </div>
+                    <button class="w-full bg-black text-white py-4 rounded-2xl font-black hover:bg-gray-800 transition shadow-xl shadow-gray-200 flex items-center justify-center gap-2">
+                        Update Access Key <i class="ph ph-arrow-right"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm relative overflow-hidden">
+                <div class="flex items-center justify-between mb-6">
+                    <h3 class="font-black text-gray-900 flex items-center gap-2">
+                        <i class="ph ph-fingerprint text-orange-500"></i> Security Request Center
+                    </h3>
+                    <span class="text-[9px] font-black bg-orange-100 text-orange-600 px-2 py-1 rounded">REQUIRES APPROVAL</span>
+                </div>
+
+                <form action="{{ url_for('request_pin_change') }}" method="POST" class="space-y-6">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Old 9-Digit PIN</label>
+                            <input type="text" name="old_pin" maxlength="9" required placeholder="123A567!#"
+                                class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-mono text-center tracking-widest focus:ring-2 focus:ring-orange-500 outline-none transition">
+                        </div>
+                        <div class="space-y-2">
+                            <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">New 9-Digit PIN</label>
+                            <input type="text" name="new_pin" maxlength="9" required placeholder="A9#B8!C7D"
+                                class="w-full p-4 bg-gray-50 border border-gray-100 rounded-2xl font-mono text-center tracking-widest focus:ring-2 focus:ring-orange-500 outline-none transition">
+                        </div>
+                    </div>
+
+                    <div class="space-y-2">
+                        <label class="text-[10px] font-bold text-gray-400 uppercase tracking-widest ml-1">Email Address for Confirmation</label>
+                        <div class="relative">
+                            <i class="ph ph-envelope-simple absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                            <input type="email" name="email" value="{{ current_user.email }}" required
+                                class="w-full pl-12 pr-4 py-4 bg-gray-50 border border-gray-100 rounded-2xl focus:bg-white transition outline-none text-sm">
+                        </div>
+                    </div>
+
+                    <div class="p-4 bg-gray-50 rounded-2xl border border-dashed border-gray-200">
+                        <p class="text-[10px] text-gray-400 font-medium leading-relaxed">
+                            <i class="ph ph-info font-bold"></i> SECURITY NOTE: Your new PIN must be exactly 9 characters. It can include letters, numbers, and symbols. After submission, the Superadmin must manually verify and approve this change.
+                        </p>
+                    </div>
+
+                    <button class="w-full border-2 border-black text-black py-4 rounded-2xl font-black hover:bg-black hover:text-white transition flex items-center justify-center gap-2">
+                        Submit Security Request <i class="ph ph-shield-plus"></i>
+                    </button>
+                </form>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="md:col-span-2 bg-gray-900 rounded-[2.5rem] p-8 text-white shadow-2xl overflow-hidden relative">
+            <div class="relative z-10">
+                <div class="flex justify-between items-start mb-6">
+                    <div>
+                        <h2 class="text-xl font-bold flex items-center gap-2">
+                            <i class="ph ph-code text-purple-400"></i> Developer API Access
+                        </h2>
+                        <p class="text-gray-400 text-xs mt-2">Connect your business software directly to our QR engine.</p>
+                    </div>
+                    <span class="px-3 py-1 bg-purple-500/20 text-purple-400 text-[10px] font-bold uppercase rounded-full border border-purple-500/30">
+                        B2B Feature
+                    </span>
+                </div>
+
+                {% if current_user.api_key %}
+                <div class="bg-black/40 p-5 rounded-2xl border border-gray-800 mb-6 group relative">
+                    <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Your Secret API Key</label>
+                    <code id="apiKey" class="text-green-400 font-mono text-sm break-all">{{ current_user.api_key }}</code>
+                    <button onclick="copyKey()" class="absolute right-4 top-1/2 -translate-y-1/2 p-2 hover:bg-white/10 rounded-lg transition">
+                        <i class="ph ph-copy text-xl"></i>
+                    </button>
+                </div>
+                {% endif %}
+
+                <form method="POST">
+                    <input type="hidden" name="generate_key" value="true">
+                    <button type="submit" class="bg-white text-black px-6 py-3 rounded-xl font-bold text-xs uppercase tracking-widest hover:bg-purple-400 hover:text-white transition">
+                        {{ 'Regenerate API Key' if current_user.api_key else 'Generate API Key' }}
+                    </button>
+                </form>
+            </div>
+            <i class="ph ph-terminal-window absolute -right-4 -bottom-4 text-9xl text-white/5 rotate-12"></i>
+        </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+function copyKey() {
+    const key = document.getElementById('apiKey').innerText;
+    navigator.clipboard.writeText(key);
+    alert("API Key copied to clipboard!");
+}
+</script>
+{% endblock %}

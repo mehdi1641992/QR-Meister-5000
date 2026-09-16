@@ -1,0 +1,140 @@
+{% extends "admin/base.html" %}
+{% block content %}
+
+<div class="max-w-6xl mx-auto space-y-8 pb-12">
+    
+    <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+            <div class="flex items-center gap-3 mb-1">
+                <h2 class="text-3xl font-black text-gray-900 tracking-tight">
+                    {{ 'System Overview' if current_user.is_superadmin else 'Business Intelligence' }}
+                </h2>
+                <div class="px-3 py-1 rounded-full text-[10px] font-black uppercase tracking-widest border {{ 'bg-orange-50 text-orange-600 border-orange-100' if current_user.is_pro else 'bg-gray-50 text-gray-400 border-gray-100' }}">
+                    <i class="ph-fill ph-crown mr-1"></i> {{ 'Pro Plan' if current_user.is_pro else 'Basic Plan' }}
+                </div>
+            </div>
+            <p class="text-sm text-gray-500 font-medium">
+                {{ 'Platform performance and global administrative metrics.' if current_user.is_superadmin else 'Track and manage your dynamic QR engagement.' }}
+            </p>
+        </div>
+        <a href="{{ url_for('index') }}" target="_blank" class="flex items-center gap-2 text-xs font-bold text-blue-600 bg-blue-50 px-5 py-2.5 rounded-xl hover:bg-blue-100 transition border border-blue-100">
+            <i class="ph ph-browser"></i> View Live Site
+        </a>
+    </div>
+
+    {% if current_user.is_superadmin %}
+    <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3 mb-4 text-blue-500">
+                <i class="ph ph-qr-code text-2xl"></i>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Total System QRs</span>
+            </div>
+            <p class="text-4xl font-black text-gray-900">{{ stats.total_qr }}</p>
+        </div>
+        
+        <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3 mb-4 text-purple-500">
+                <i class="ph ph-question text-2xl"></i>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Active FAQs</span>
+            </div>
+            <p class="text-4xl font-black text-gray-900">{{ stats.total_faqs }}</p>
+        </div>
+
+        <div class="bg-white p-8 rounded-[2rem] border border-gray-100 shadow-sm">
+            <div class="flex items-center gap-3 mb-4 text-orange-500">
+                <i class="ph ph-users-four text-2xl"></i>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-400">Identities</span>
+            </div>
+            <p class="text-4xl font-black text-gray-900">{{ stats.total_users }}</p>
+        </div>
+
+        <div class="bg-black p-8 rounded-[2rem] border border-gray-800 shadow-xl">
+            <div class="flex items-center gap-3 mb-4 text-green-400">
+                <i class="ph ph-bank text-2xl"></i>
+                <span class="text-[10px] font-black uppercase tracking-widest text-gray-500">Platform Revenue</span>
+            </div>
+            <p class="text-4xl font-black text-white">৳ {{ stats.revenue|default(0)|int }}</p>
+        </div>
+    </div>
+    
+    {% if stats.pending_requests > 0 %}
+    <div class="bg-orange-50 border border-orange-100 p-6 rounded-[2.5rem] flex items-center justify-between shadow-lg shadow-orange-100/50">
+        <div class="flex items-center gap-4">
+            <div class="w-14 h-14 bg-orange-100 text-orange-600 rounded-2xl flex items-center justify-center animate-pulse">
+                <i class="ph ph-shield-warning text-3xl"></i>
+            </div>
+            <div>
+                <h4 class="font-black text-orange-900">Security Approval Required</h4>
+                <p class="text-sm text-orange-700 font-medium">{{ stats.pending_requests }} members are requesting identity or PIN updates.</p>
+            </div>
+        </div>
+        <a href="{{ url_for('admin_users') }}" class="bg-black text-white px-8 py-3.5 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-orange-600 transition shadow-xl">Review Queue</a>
+    </div>
+    {% endif %}
+    {% endif %}
+
+    <div class="bg-white border border-gray-100 rounded-[2.5rem] p-8 shadow-sm flex flex-col md:flex-row items-center gap-8 mb-10 group">
+        <div class="w-32 h-32 bg-gray-50 rounded-3xl border-2 border-dashed border-gray-200 flex items-center justify-center overflow-hidden p-2 group-hover:border-blue-300 transition-colors">
+            <img src="{{ url_for('generate_bio_qr', username=current_user.username) }}" alt="Bio QR" class="w-full h-full object-contain">
+        </div>
+        <div class="flex-1 text-center md:text-left">
+            <div class="inline-flex items-center gap-2 px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-[10px] font-black uppercase tracking-widest mb-3">
+                <i class="ph ph-identification-card"></i> Digital Business Card
+            </div>
+            <h3 class="text-2xl font-black tracking-tight text-gray-900">@{{ current_user.username }}</h3>
+            <p class="text-sm text-gray-500 mt-1">Short link: <span class="text-blue-500 font-mono">{{ request.host_url }}b/{{ current_user.username }}</span></p>
+            
+            <div class="flex flex-wrap gap-3 mt-6 justify-center md:justify-start">
+                <a href="{{ url_for('generate_bio_qr', username=current_user.username, download=1) }}" class="bg-black text-white px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-gray-800 transition shadow-lg shadow-gray-200">
+                    <i class="ph ph-download-simple"></i> Download QR
+                </a>
+                <button onclick="navigator.clipboard.writeText('{{ request.host_url }}b/{{ current_user.username }}'); alert('Bio link copied!');" class="bg-gray-100 text-gray-600 px-6 py-3 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-gray-200 transition">
+                    <i class="ph ph-copy"></i> Copy Link
+                </button>
+                <a href="{{ url_for('bio_link', username=current_user.username) }}" target="_blank" class="text-gray-400 px-6 py-3 font-black text-[10px] uppercase tracking-widest hover:text-blue-600 transition">
+                    Preview Page <i class="ph ph-arrow-square-out ml-1"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    {% if stats.my_campaigns == 0 and not current_user.is_superadmin %}
+    <div class="bg-gradient-to-br from-blue-600 to-purple-700 rounded-[3rem] p-12 text-white shadow-2xl relative overflow-hidden">
+        <div class="relative z-10">
+            <h2 class="text-4xl font-black tracking-tighter mb-4">Start Your First Campaign</h2>
+            <p class="text-blue-100 mb-10 max-w-md text-lg leading-relaxed">You haven't created any dynamic links yet. Launch a campaign to start tracking real-time scans.</p>
+            <a href="{{ url_for('admin_campaigns') }}" class="inline-flex items-center gap-3 bg-white text-blue-600 px-10 py-5 rounded-[1.5rem] font-black shadow-2xl hover:scale-105 transition-all">
+                <i class="ph ph-plus-circle text-xl"></i> Create Dynamic QR
+            </a>
+        </div>
+        <i class="ph ph-rocket-launch absolute -right-10 -bottom-10 text-[22rem] text-white/10 -rotate-12 pointer-events-none"></i>
+    </div>
+    {% elif not current_user.is_superadmin or (current_user.is_superadmin and stats.my_campaigns > 0) %}
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
+            <div class="w-14 h-14 bg-blue-50 text-blue-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <i class="ph ph-megaphone text-3xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">My Active Campaigns</p>
+            <h3 class="text-5xl font-black text-gray-900 tracking-tighter">{{ stats.my_campaigns }}</h3>
+        </div>
+        
+        <div class="group bg-white p-10 rounded-[2.5rem] border border-gray-100 shadow-sm hover:shadow-xl transition-all duration-500">
+            <div class="w-14 h-14 bg-purple-50 text-purple-500 rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform">
+                <i class="ph ph-chart-line-up text-3xl"></i>
+            </div>
+            <p class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-2">Global Scan Engagement</p>
+            <h3 class="text-5xl font-black text-gray-900 tracking-tighter">{{ stats.my_scans }}</h3>
+        </div>
+    </div>
+    
+    <div class="text-center pt-8">
+        <a href="{{ url_for('admin_campaigns') }}" class="text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] hover:text-blue-600 transition flex items-center justify-center gap-2">
+            Manage Link Ledger <i class="ph ph-arrow-right"></i>
+        </a>
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

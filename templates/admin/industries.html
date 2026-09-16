@@ -1,0 +1,57 @@
+{% extends "admin/base.html" %}
+{% block title %}Industry Manager{% endblock %}
+{% block content %}
+<div class="space-y-8">
+    <div class="bg-white p-8 rounded-3xl shadow-sm border border-gray-100">
+        <h2 class="text-xl font-black text-gray-800 mb-6 flex items-center gap-2">
+            <i class="ph ph-plus-circle text-blue-600"></i> Add New Industry Solution
+        </h2>
+        <form method="POST" class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <input type="text" name="name" placeholder="Industry Name (e.g. Healthcare)" class="p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition font-bold" required>
+            <input type="text" name="slug" placeholder="URL Slug (e.g. healthcare)" class="p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition font-mono text-sm" required>
+            <input type="text" name="icon" placeholder="Phosphor Icon (e.g. ph-first-aid)" class="p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition">
+            <input type="text" name="action_text" placeholder="Action (e.g. Patient Portal)" class="p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition">
+            <input type="text" name="benefit_text" placeholder="Benefit (e.g. Faster Check-ins)" class="p-4 bg-gray-50 border border-gray-100 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 transition">
+            <button type="submit" class="bg-black text-white rounded-xl font-bold uppercase tracking-widest hover:bg-blue-600 transition">Create Solution</button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-3xl shadow-sm border border-gray-100 overflow-hidden">
+        <table class="w-full text-left border-collapse">
+            <thead class="bg-gray-50 border-b border-gray-100">
+                <tr>
+                    <th class="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Industry</th>
+                    <th class="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400">Marketing Hook</th>
+                    <th class="p-6 text-[10px] font-black uppercase tracking-widest text-gray-400 text-right">Actions</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for ind in industries %}
+                <tr class="hover:bg-gray-50/50 transition">
+                    <td class="p-6">
+                        <div class="flex items-center gap-4">
+                            <div class="w-10 h-10 bg-blue-50 text-blue-600 rounded-lg flex items-center justify-center text-xl">
+                                <i class="ph {{ ind.icon }}"></i>
+                            </div>
+                            <div>
+                                <p class="font-bold text-gray-800">{{ ind.name }}</p>
+                                <p class="text-[10px] font-mono text-gray-400">/solutions/{{ ind.slug }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td class="p-6">
+                        <span class="text-xs font-bold text-gray-600">{{ ind.action_text }}</span>
+                        <i class="ph ph-arrow-right mx-2 text-gray-300"></i>
+                        <span class="text-xs font-medium text-gray-400">{{ ind.benefit_text }}</span>
+                    </td>
+                    <td class="p-6 text-right space-x-2">
+                        <a href="{{ url_for('edit_industry', id=ind.id) }}" class="inline-flex items-center gap-2 text-blue-600 font-bold text-xs uppercase hover:underline">Edit</a>
+                        <a href="{{ url_for('delete_industry', id=ind.id) }}" onclick="return confirm('Wipe this solution?')" class="text-red-400 font-bold text-xs uppercase hover:text-red-600 transition">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,55 @@
+{% extends "admin/base.html" %}
+{% block title %}Traffic Analytics{% endblock %}
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-8">
+    <h1 class="text-3xl font-black text-gray-800">Traffic Intelligence</h1>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Popularity by Industry</h3>
+            <canvas id="industryChart"></canvas>
+        </div>
+
+        <div class="bg-white p-8 rounded-[2rem] shadow-sm border border-gray-100">
+            <h3 class="text-xs font-black uppercase tracking-widest text-gray-400 mb-6">Device Usage</h3>
+            <div class="max-w-[250px] mx-auto">
+                <canvas id="deviceChart"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Industry Data
+    const industryCtx = document.getElementById('industryChart').getContext('2d');
+    new Chart(industryCtx, {
+        type: 'bar',
+        data: {
+            labels: [{% for item in industry_stats %}"{{ item[0] }}",{% endfor %}],
+            datasets: [{
+                label: 'Page Views',
+                data: [{% for item in industry_stats %}{{ item[1] }},{% endfor %}],
+                backgroundColor: '#2563eb',
+                borderRadius: 10
+            }]
+        },
+        options: { plugins: { legend: { display: false } } }
+    });
+
+    // Device Data
+    const deviceCtx = document.getElementById('deviceChart').getContext('2d');
+    new Chart(deviceCtx, {
+        type: 'doughnut',
+        data: {
+            labels: ['Mobile', 'Desktop'],
+            datasets: [{
+                data: [{{ mobile_count }}, {{ desktop_count }}],
+                backgroundColor: ['#9333ea', '#e2e8f0'],
+                borderWidth: 0
+            }]
+        },
+        options: { cutout: '80%' }
+    });
+</script>
+{% endblock %}

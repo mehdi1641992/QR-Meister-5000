@@ -1,0 +1,209 @@
+{% extends "admin/base.html" %}
+{% block content %}
+<div class="max-w-6xl mx-auto space-y-10 pb-12">
+
+    <div class="flex items-center justify-between">
+        <div>
+            <h2 class="text-3xl font-black text-gray-900 tracking-tight">Authority Center</h2>
+            <p class="text-sm text-gray-500 font-medium">Manage members, security requests, and revenue tracking.</p>
+        </div>
+        <div class="hidden md:flex gap-4">
+             <div class="text-right">
+                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Total Members</p>
+                <p class="text-xl font-black text-gray-900">{{ users|length }}</p>
+             </div>
+        </div>
+    </div>
+
+    <div class="relative group">
+        <div class="absolute -inset-1 bg-gradient-to-r from-orange-500 to-yellow-500 rounded-2xl blur opacity-15 group-hover:opacity-25 transition duration-1000"></div>
+        <div class="relative bg-white rounded-2xl border border-orange-100 shadow-xl shadow-orange-100/20 overflow-hidden">
+            <div class="bg-orange-50/50 p-4 border-b border-orange-100 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 bg-orange-100 text-orange-600 rounded-lg flex items-center justify-center animate-pulse">
+                        <i class="ph ph-shield-warning text-xl"></i>
+                    </div>
+                    <h3 class="font-bold text-orange-900 text-sm uppercase tracking-widest">Security Approval Queue</h3>
+                </div>
+                {% set pending_count = users|selectattr('pending_update_type')|list|length %}
+                <span class="bg-orange-200 text-orange-800 text-[10px] font-black px-2 py-1 rounded-full">{{ pending_count }} PENDING</span>
+            </div>
+
+            <div class="overflow-x-auto">
+                <table class="w-full text-left text-sm">
+                    <tbody class="divide-y divide-orange-50">
+                        {% for user in users if user.pending_update_type %}
+                        <tr class="hover:bg-orange-50/30 transition">
+                            <td class="p-5">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-10 h-10 bg-gray-100 rounded-full flex items-center justify-center font-bold text-gray-400">
+                                        {{ user.username[0]|upper }}
+                                    </div>
+                                    <div>
+                                        <div class="font-bold text-gray-900">{{ user.username }}</div>
+                                        <div class="text-[10px] font-mono text-gray-400">{{ user.uid or 'NO-UID' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="p-5">
+                                <div class="inline-flex items-center gap-2 px-3 py-1 bg-white border border-orange-200 rounded-lg shadow-sm">
+                                    <i class="ph ph-fingerprint text-orange-500"></i>
+                                    <span class="text-xs font-bold text-gray-600 capitalize">{{ user.pending_update_type }} Change</span>
+                                </div>
+                            </td>
+                            <td class="p-5">
+                                <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Proposed Value</p>
+                                <code class="bg-gray-900 text-green-400 px-2 py-1 rounded text-xs font-mono">
+                                    {{ user.pending_value if user.pending_update_type != 'pin' else '•••••••••' }}
+                                </code>
+                            </td>
+                            <td class="p-5 text-right">
+                                <div class="flex justify-end gap-2">
+                                    <a href="{{ url_for('approve_request', user_id=user.id, action='confirm') }}" class="px-4 py-2 bg-black text-white rounded-xl text-xs font-bold hover:bg-orange-600 transition shadow-lg shadow-orange-100 flex items-center gap-2">
+                                        <i class="ph ph-check-circle"></i> Approve
+                                    </a>
+                                    <a href="{{ url_for('approve_request', user_id=user.id, action='deny') }}" class="px-4 py-2 text-gray-400 hover:text-red-500 transition text-xs font-bold">
+                                        Dismiss
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td class="p-12 text-center">
+                                <i class="ph ph-shield-check text-4xl text-gray-200 mb-2 block"></i>
+                                <p class="text-gray-400 font-medium">All security protocols are currently synchronized.</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <div class="bg-white p-8 rounded-3xl border border-gray-100 shadow-xl shadow-gray-200/50">
+        <div class="flex items-center gap-4 mb-8">
+            <div class="w-12 h-12 bg-yellow-50 text-yellow-500 rounded-2xl flex items-center justify-center">
+                <i class="ph ph-crown-simple text-3xl"></i>
+            </div>
+            <div>
+                <h3 class="text-xl font-black text-gray-900">Activate Pro Member</h3>
+                <p class="text-xs text-gray-400 font-bold uppercase tracking-widest">Revenue Generation Portal</p>
+            </div>
+        </div>
+
+        <form action="{{ url_for('create_pro_user') }}" method="POST" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Username</label>
+                <div class="relative">
+                    <i class="ph ph-user absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" name="username" placeholder="E.g. pixel_shop" required class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-gray-200 focus:ring-4 focus:ring-gray-100 transition outline-none text-sm">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Email Address</label>
+                <div class="relative">
+                    <i class="ph ph-envelope-simple absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="email" name="email" placeholder="client@email.com" required class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-gray-200 focus:ring-4 focus:ring-gray-100 transition outline-none text-sm">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">bKash/Nagad TxnID</label>
+                <div class="relative">
+                    <i class="ph ph-hash absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="text" name="txn_id" placeholder="8N7X2L..." required class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-gray-200 focus:ring-4 focus:ring-gray-100 transition outline-none text-sm">
+                </div>
+            </div>
+            <div class="space-y-2">
+                <label class="text-[10px] font-black text-gray-400 uppercase tracking-widest ml-1">Amount Paid (BDT)</label>
+                <div class="relative">
+                    <i class="ph ph-currency-circle-dollar absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                    <input type="number" name="amount" placeholder="1500" required class="w-full pl-11 pr-4 py-3 bg-gray-50 border border-transparent rounded-2xl focus:bg-white focus:border-gray-200 focus:ring-4 focus:ring-gray-100 transition outline-none text-sm">
+                </div>
+            </div>
+            <button class="md:col-span-4 bg-black text-white py-4 rounded-2xl font-black hover:bg-gray-800 transition shadow-2xl shadow-gray-200 flex items-center justify-center gap-3">
+                <i class="ph ph-sparkle text-xl"></i> Finalize Activation & Issue UID
+            </button>
+        </form>
+    </div>
+
+    <div class="bg-white rounded-3xl border border-gray-100 shadow-xl overflow-hidden">
+        <div class="p-6 border-b border-gray-50 flex items-center justify-between">
+            <h3 class="font-black text-gray-900">The Ledger <span class="text-xs text-gray-400 font-medium ml-2">All Registered Identities</span></h3>
+            <i class="ph ph-list-numbers text-2xl text-gray-200"></i>
+        </div>
+        <div class="overflow-x-auto">
+            <table class="w-full text-left text-sm">
+                <thead class="bg-gray-50/50 text-[10px] font-black text-gray-400 uppercase tracking-widest border-b border-gray-50">
+                    <tr>
+                        <th class="p-5">Member Identity</th>
+                        <th class="p-5">Access Tier</th>
+                        <th class="p-5">Revenue / TXN</th>
+                        <th class="p-5 text-right">Management</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-gray-50">
+                    {% for user in users %}
+                    <tr class="hover:bg-gray-50/50 transition group">
+                        <td class="p-5">
+                            <div class="flex items-center gap-4">
+                                <div class="w-10 h-10 rounded-xl bg-gray-900 text-white flex items-center justify-center font-bold">
+                                    {{ user.username[0]|upper }}
+                                </div>
+                                <div>
+                                    <div class="font-black text-gray-900">{{ user.username }}</div>
+                                    <div class="text-[10px] font-mono text-blue-500 uppercase tracking-tighter">{{ user.uid or 'STAFF-MEMBER' }}</div>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-5">
+                            {% if user.is_superadmin %}
+                                <div class="inline-flex items-center gap-2 px-2 py-1 bg-black text-white rounded-md text-[9px] font-black uppercase">
+                                    <i class="ph ph-shield-star"></i> Owner
+                                </div>
+                            {% elif user.is_pro %}
+                                <div class="inline-flex items-center gap-2 px-2 py-1 bg-yellow-400 text-black rounded-md text-[9px] font-black uppercase">
+                                    <i class="ph ph-crown"></i> Pro Tier
+                                </div>
+                            {% else %}
+                                <div class="inline-flex items-center gap-2 px-2 py-1 bg-gray-100 text-gray-500 rounded-md text-[9px] font-black uppercase">
+                                    <i class="ph ph-identification-badge"></i> Staff
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="p-5">
+                            {% if user.is_pro %}
+                                <div class="text-xs font-bold text-gray-900">৳{{ "{:,.0f}".format(user.amount_paid) }}</div>
+                                <div class="text-[9px] text-gray-400 font-mono">{{ user.transaction_id }}</div>
+                            {% else %}
+                                <span class="text-gray-200">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="p-5 text-right">
+    <div class="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition">
+        <a href="{{ url_for('reset_user_pin', id=user.id) }}"
+           onclick="return confirm('Reset security PIN to default 123456789?')"
+           class="p-2 text-gray-400 hover:text-orange-500 hover:bg-orange-50 rounded-lg transition"
+           data-tippy-content="Reset PIN to default (123456789)">
+            <i class="ph ph-shield-warning"></i>
+        </a>
+
+        {% if not user.is_superadmin %}
+        <a href="{{ url_for('delete_user', id=user.id) }}"
+           onclick="return confirm('EXTERMINATE ACCOUNT?')"
+           class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition"
+           data-tippy-content="Permanently delete this user">
+            <i class="ph ph-trash-simple"></i>
+        </a>
+        {% endif %}
+    </div>
+</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

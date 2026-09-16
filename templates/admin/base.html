@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ config.site_name }} - Admin Panel</title>
+    <link rel="icon" href="{{ url_for('static', filename='uploads/' + config.favicon) }}">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/dist/tippy.css" />
+</head>
+<body class="bg-gray-50 flex h-screen">
+
+    <aside class="w-64 bg-gray-900 text-white flex flex-col">
+        <div class="p-6 border-b border-gray-800">
+            <h1 class="text-xl font-bold tracking-wider truncate" title="{{ config.site_name }}">
+                {{ config.site_name or 'QR MASTER' }}
+            </h1>
+            <p class="text-xs text-gray-400 mt-1">Control Center</p>
+        </div>
+
+        <nav class="flex-1 p-4 space-y-1">
+            <a href="{{ url_for('admin_dashboard') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 {{ 'bg-gray-800' if request.endpoint == 'admin_dashboard' }}">
+                <i class="ph ph-chart-pie-slice"></i> Dashboard
+            </a>
+
+            <a href="{{ url_for('admin_campaigns') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 {{ 'bg-gray-800' if 'campaigns' in request.endpoint }}">
+                <i class="ph ph-megaphone"></i> Campaign Master
+            </a>
+            <a href="{{ url_for('bulk_generate') }}" class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-gray-800 {{ 'bg-gray-800' if request.endpoint == 'bulk_generate' }}">
+                <i class="ph ph-stack"></i> Bulk Engine
+            </a>
+
+            {% if current_user.is_superadmin %}
+            <div class="pt-6 pb-2 pl-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">Global Management</div>
+            
+            <a href="{{ url_for('admin_analytics') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800 text-blue-400' if request.endpoint == 'admin_analytics' }}">
+                <i class="ph ph-chart-line-up"></i> Analytics
+            </a>
+            
+            <a href="{{ url_for('admin_industries') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800 text-purple-400' if request.endpoint == 'admin_industries' }}">
+                <i class="ph ph-buildings"></i> Industries & Solutions
+            </a>
+
+            <a href="{{ url_for('admin_settings') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800' if request.endpoint == 'admin_settings' }}">
+                <i class="ph ph-palette"></i> Site Branding
+            </a>
+            <a href="{{ url_for('admin_faqs') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800' if request.endpoint == 'admin_faqs' }}">
+                <i class="ph ph-question"></i> FAQ Manager
+            </a>
+            <a href="{{ url_for('admin_users') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800' if request.endpoint == 'admin_users' }}">
+                <i class="ph ph-users-four"></i> User Approvals & UID
+            </a>
+            <a href="{{ url_for('admin_pages') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800' if request.endpoint == 'admin_pages' }}">
+                <i class="ph ph-files"></i> Legal Pages
+            </a>
+            {% endif %}
+
+            <div class="pt-6 pb-2 pl-4 text-[10px] font-bold text-gray-500 uppercase tracking-widest">My Account</div>
+            <a href="{{ url_for('admin_profile') }}" class="flex items-center gap-3 px-4 py-2 rounded-lg hover:bg-gray-800 text-sm {{ 'bg-gray-800' if request.endpoint == 'admin_profile' }}">
+                <i class="ph ph-user-circle"></i> Profile Settings
+            </a>
+        </nav>
+
+        <div class="p-4 border-t border-gray-800">
+            <a href="{{ url_for('logout') }}" class="flex items-center gap-3 px-4 py-2 text-red-400 hover:text-red-300 transition">
+                <i class="ph ph-sign-out"></i> Logout
+            </a>
+        </div>
+    </aside>
+
+    <main class="flex-1 overflow-y-auto p-8">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="mb-4 p-4 rounded-lg {{ 'bg-green-100 text-green-700 border border-green-200' if category == 'success' else 'bg-red-100 text-red-700 border border-red-200' }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+</body>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        tippy('[data-tippy-content]', {
+            theme: 'translucent',
+            animation: 'shift-away',
+            placement: 'top'
+        });
+    });
+</script>
+</html>

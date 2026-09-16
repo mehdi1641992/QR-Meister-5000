@@ -1,0 +1,36 @@
+{% extends "admin/base.html" %}
+{% block title %}Manage Pages{% endblock %}
+{% block content %}
+<div class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100">
+    <div class="flex justify-between items-center mb-8">
+        <h2 class="text-2xl font-bold text-gray-800">Legal Pages</h2>
+    </div>
+
+    <div class="overflow-hidden rounded-xl border border-gray-100">
+        <table class="w-full text-left text-sm text-gray-500">
+            <thead class="bg-gray-50 text-xs uppercase font-bold text-gray-400">
+                <tr>
+                    <th class="px-6 py-4">Title</th>
+                    <th class="px-6 py-4">Slug</th>
+                    <th class="px-6 py-4">Last Updated</th>
+                    <th class="px-6 py-4 text-right">Action</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+                {% for page in pages %}
+                <tr class="hover:bg-gray-50 transition">
+                    <td class="px-6 py-4 font-bold text-gray-800">{{ page.title }}</td>
+                    <td class="px-6 py-4 font-mono text-xs">{{ page.slug }}</td>
+                    <td class="px-6 py-4">{{ page.updated_at.strftime('%Y-%m-%d') }}</td>
+                    <td class="px-6 py-4 text-right">
+                        <a href="{{ url_for('edit_page', slug=page.slug) }}" class="inline-flex items-center gap-2 bg-blue-50 text-blue-600 px-3 py-1.5 rounded-lg text-xs font-bold uppercase hover:bg-blue-100 transition">
+                            <i class="ph ph-pencil-simple"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
